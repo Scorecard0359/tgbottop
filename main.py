@@ -1,37 +1,41 @@
-import asyncio, logging, os
+import asyncio, logging
 
 from aiogram import Bot, Dispatcher, F
 from aiogram.filters import Command
 from aiogram.types import Message, FSInputFile
-from dotenv import load_dotenv
 
-load_dotenv()
+from config import BotConfig
+from handlers import register_all_handlers
 
-logging.basicConfig(level=logging.INFO)
+class TelegramBot:
 
-TOKEN = os.getenv("BOT_TOKEN")
+    def __init__(self):
 
-bot = Bot(token=TOKEN)
-dp = Dispatcher()
+        logging.basicConfig(level=logging.INFO)
 
-@dp.message(Command("start"))
-async def cmd_start(message: Message):
-    await message.answer("⭐️")
+        self.token = BotConfig.get_token()
 
-@dp.message(Command("beer"))
-async def cmd_beer(message: Message):
-    # await message.answer("придётся подождать")
+        self.bot = Bot(token=self.token)
 
-    photo_path = "img/beer.png"
+        self.dp = Dispatcher()
 
-    photo = FSInputFile(photo_path)
+        register_all_handlers(self.dp)
 
-    await message.answer_photo(
-        photo=photo
-    )
+        logging.info("Бот инициализирован.")
+
+    async def start(self):
+
+        bot_info = await self.bot.me()
+
+        print(bot_info.first_name, bot_info.username, bot_info.id)
+
+        await self.dp.start_polling(self.bot, skip_updates=True)
 
 async def main():
-    await dp.start_polling(bot, skip_updates=True)
+
+    bot = TelegramBot()
+
+    await bot.start()
 
 if __name__ == "__main__":
     asyncio.run(main())

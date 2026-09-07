@@ -1,6 +1,7 @@
 from aiogram import Dispatcher
 
-from .start import register_start_handlers, register_beer_handlers
+from .start import register_start_handlers
+from .beer import register_beer_handlers
 
 def register_all_handlers(dp: Dispatcher):
     

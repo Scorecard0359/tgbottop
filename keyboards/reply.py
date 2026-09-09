@@ -6,11 +6,11 @@ class ReplyKeyboards:
     def main_menu():
 
         btn_start = KeyboardButton(text="Старт")
-        btn_beer = KeyboardButton(text="Пиво")
+        btn_photo = KeyboardButton(text="Фото")
         btn_help = KeyboardButton(text="Помощь")
 
         keyboard = ReplyKeyboardMarkup(
-            keyboard=([btn_start, btn_beer], [btn_help]),
+            keyboard=([btn_start, btn_photo], [btn_help]),
             resize_keyboard=True,
             one_time_keyboard=False
         )
@@ -18,13 +18,13 @@ class ReplyKeyboards:
         return keyboard
 
     @staticmethod
-    def beer_menu():
+    def photo_menu():
 
-        btn_beer = KeyboardButton(text="Пиво")
+        btn_photo = KeyboardButton(text="Фото")
         btn_back = KeyboardButton(text="Назад")
 
         keyboard = ReplyKeyboardMarkup(
-            keyboard=([btn_beer], [btn_back]),
+            keyboard=([btn_photo], [btn_back]),
             resize_keyboard=True,
             one_time_keyboard=False
         )

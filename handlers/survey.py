@@ -19,8 +19,7 @@ def register_survey_handlers(dp: Dispatcher):
     async def cmd_survey(message: Message, state: FSMContext):
         
         await message.answer(
-            "Опрос запущен\n",
-            "Как тебя зовут?\n",
+            text="Как тебя зовут?\n",
             reply_markup=ReplyKeyboardRemove()
         )
 
@@ -31,19 +30,19 @@ def register_survey_handlers(dp: Dispatcher):
         
         await state.update_data(name=message.text)
 
-        await message.answer("Сколько лет?")
+        await message.answer(text="Сколько лет?")
         await state.set_state(SurveyStates.age)
 
     @dp.message(SurveyStates.age)
     async def process_age(message: Message, state: FSMContext):
         
         if not message.text.isdigit():
-            await message.answer("Введите число")
+            await message.answer(text="Введите число")
             return
 
         await state.update_data(age=int(message.text))
 
-        await message.answer("В каком городе живёте?")
+        await message.answer(text="В каком городе живёте?")
         await state.set_state(SurveyStates.city)
 
     @dp.message(SurveyStates.city)
@@ -51,7 +50,7 @@ def register_survey_handlers(dp: Dispatcher):
         
         await state.update_data(city=message.text)
 
-        await message.answer("На каком языке говорите?")
+        await message.answer(text="На каком языке говорите?")
         await state.set_state(SurveyStates.language)
 
     @dp.message(SurveyStates.language)
@@ -59,4 +58,27 @@ def register_survey_handlers(dp: Dispatcher):
         
         await state.update_data(language=message.text)
 
+        data = await state.get_data()
+
+        result_text = f"Опрос пройден.\nИмя: {data.get('name')}\nВозраст: {data.get('age')}\nГород: {data.get('city')}\nЯзык: {data.get('language')}\n"
+
+        keyboard = ReplyKeyboards.main_menu()
+
+        await message.answer(text=result_text, reply_markup=keyboard)
+
         await state.clear()
+
+    @dp.message(Command("cancel"))
+    async def cmd_cancel(message: Message, state: FSMContext):
+
+        current_state = await state.get_state()
+
+        if current_state is None:
+            await message.answer(
+                text="Отменять нечего, нет активных диалогов.",
+                reply_markup=ReplyKeyboards.main_menu()
+            )
+            return
+
+        await state.clear()
+        await message.answer(text="Диалог отменён.", reply_markup=ReplyKeyboards.main_menu())

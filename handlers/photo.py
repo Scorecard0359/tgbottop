@@ -6,12 +6,12 @@ from aiogram.types import Message, FSInputFile
 
 from keyboards.reply import ReplyKeyboards
 
-def register_beer_handlers(dp: Dispatcher):
+def register_photo_handlers(dp: Dispatcher):
 
-    @dp.message(Command("beer"))
-    async def cmd_beer(message: Message):
+    @dp.message(Command("photo"))
+    async def cmd_photo(message: Message):
 
-        keyboard = ReplyKeyboards.beer_menu()
+        keyboard = ReplyKeyboards.photo_menu()
 
         photo_path = os.path.join("core/img", "beer.png")
 
@@ -27,10 +27,10 @@ def register_beer_handlers(dp: Dispatcher):
             reply_markup=keyboard
         )
 
-    @dp.message(F.text == "Пиво")
-    async def handle_beer_button(message: Message):
+    @dp.message(F.text == "Фото")
+    async def handle_photo_button(message: Message):
 
-        keyboard = ReplyKeyboards.beer_menu()
+        keyboard = ReplyKeyboards.photo_menu()
 
         photo_path = os.path.join("core/img", "beer.png")
 

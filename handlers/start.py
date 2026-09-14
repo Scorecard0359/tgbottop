@@ -24,11 +24,3 @@ def register_start_handlers(dp: Dispatcher):
     async def handle_help_button(message: Message):
 
         await message.answer("❓")
-
-    # @dp.message(F.text)
-    # async def handle_other_button(message: Message):
-
-    #     if "тест" in message.text.lower():
-    #         await message.answer("ну вроде работаю")
-    #     else:
-    #         await message.answer("⭐️")

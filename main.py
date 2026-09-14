@@ -6,6 +6,10 @@ from aiogram.types import Message, FSInputFile
 
 from config import BotConfig
 from handlers import register_all_handlers
+from middlewares.logging import LoggingMiddleware
+from middlewares.auth import AdminMiddleware
+from middlewares.logfile import LogFileMiddleware
+from middlewares.counter import UserCounterMiddleware
 
 class TelegramBot:
 
@@ -19,9 +23,21 @@ class TelegramBot:
 
         self.dp = Dispatcher()
 
+        self._setup_middlewares()
+
         register_all_handlers(self.dp)
 
         logging.info("Бот инициализирован.")
+
+    def _setup_middlewares(self):
+
+        self.dp.update.outer_middleware(LoggingMiddleware())
+
+        self.dp.update.outer_middleware(LogFileMiddleware())
+
+        # self.dp.update.outer_middleware(UserCounterMiddleware())
+
+        # * self.dp.update.outer_middleware(AdminMiddleware())
 
     async def start(self):
 

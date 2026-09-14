@@ -45,3 +45,8 @@ def register_photo_handlers(dp: Dispatcher):
             photo=photo,
             reply_markup=keyboard
         )
+
+    @dp.message(F.text == "Назад")
+    async def handle_back_button(message: Message):
+
+        await message.answer("⭐️", reply_markup=ReplyKeyboards.main_menu())

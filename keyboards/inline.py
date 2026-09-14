@@ -6,7 +6,7 @@ class InlineKeyboards:
     def main_menu() -> InlineKeyboardMarkup:
 
         keyboard = InlineKeyboardMarkup(
-            [
+            inline_keyboard=[
                 [
                     InlineKeyboardButton (
                         text="Информация",
@@ -18,7 +18,7 @@ class InlineKeyboards:
                     )
                 ],
                 [
-                InlineKeyboardButton (
+                    InlineKeyboardButton (
                         text="Опрос",
                         callback_data="survey"
                     ),

@@ -16,7 +16,7 @@ def register_inline_handlers(dp: Dispatcher):
         keyboard = InlineKeyboards.main_menu()
 
         await message.answer(
-            "Меню бота:\n",
+            "Меню бота:\n"
             "Выберите действие.",
             reply_markup=keyboard
         )

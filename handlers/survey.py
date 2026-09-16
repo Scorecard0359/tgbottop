@@ -5,6 +5,7 @@ from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import State, StatesGroup
 
 from keyboards.reply import ReplyKeyboards
+from database.db import Database
 
 class SurveyStates(StatesGroup):
 
@@ -54,18 +55,22 @@ def register_survey_handlers(dp: Dispatcher):
         await state.set_state(SurveyStates.language)
 
     @dp.message(SurveyStates.language)
-    async def process_name(message: Message, state: FSMContext):
-        
+    async def proces_language(message: Message, state: FSMContext):
         await state.update_data(language=message.text)
-
         data = await state.get_data()
 
-        result_text = f"Опрос пройден.\nИмя: {data.get('name')}\nВозраст: {data.get('age')}\nГород: {data.get('city')}\nЯзык: {data.get('language')}\n"
+        await Database.save_survey(
+            user_id=message.from_user.id,
+            name=data.get("name"),
+            age=data.get("age"),
+            city=data.get("city"),
+            language=data.get("language")
+        )
+
+        result_text = f"Опрос пройден.\nИмя: {data.get('name')}\nВозраст: {data.get('age')}\nГород: {data.get('city')}\nЯзык: {data.get('language')}\nДанные сохранены в базе.\nПосмотреть историю: /history\n"
 
         keyboard = ReplyKeyboards.main_menu()
-
-        await message.answer(text=result_text, reply_markup=keyboard)
-
+        await message.answer(result_text, reply_markup=keyboard)
         await state.clear()
 
     @dp.message(Command("cancel"))

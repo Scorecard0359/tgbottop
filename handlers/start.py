@@ -3,11 +3,18 @@ from aiogram.filters import Command
 from aiogram.types import Message
 
 from keyboards.reply import ReplyKeyboards
+from database.db import Database
 
 def register_start_handlers(dp: Dispatcher):
 
     @dp.message(Command("start"))
     async def cmd_start(message: Message):
+
+        await Database.add_user(
+            user_id=message.from_user.id,
+            username=message.from_user.username,
+            first_name=message.from_user.first_name
+        )
 
         keyboard = ReplyKeyboards.main_menu()
 

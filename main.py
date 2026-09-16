@@ -10,6 +10,7 @@ from middlewares.logging import LoggingMiddleware
 from middlewares.auth import AdminMiddleware
 from middlewares.logfile import LogFileMiddleware
 from middlewares.counter import UserCounterMiddleware
+from database.db import Database
 
 class TelegramBot:
 
@@ -41,9 +42,11 @@ class TelegramBot:
 
     async def start(self):
 
+        await Database.init()
+
         bot_info = await self.bot.me()
 
-        print(bot_info.first_name, bot_info.username, bot_info.id)
+        print("Бот запущен.", bot_info.first_name, bot_info.username, bot_info.id)
 
         await self.dp.start_polling(self.bot, skip_updates=True)
 

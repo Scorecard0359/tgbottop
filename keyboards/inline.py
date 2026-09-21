@@ -31,3 +31,24 @@ class InlineKeyboards:
         )
 
         return keyboard
+
+    @staticmethod
+    def pagination(page: int, total_pages: int):
+
+        buttons = []
+
+        if page > 0:
+            buttons.append(
+                InlineKeyboardButton(text="Назад", callback_data=f"page_{page-1}")
+            )
+
+        buttons.append(
+            InlineKeyboardButton(text=f"{page+1}/{total_pages}", callback_data="current")
+        )
+
+        if page < total_pages:
+            buttons.append(
+                InlineKeyboardButton(text="Вперед", callback_data=f"page_{page+1}")
+            )
+
+        return InlineKeyboardMarkup(inline_keyboard=[buttons])

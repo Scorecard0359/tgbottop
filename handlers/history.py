@@ -1,8 +1,11 @@
-from aiogram import Dispatcher
+from aiogram import Dispatcher, F
 from aiogram.filters import Command
-from aiogram.types import Message
+from aiogram.types import Message, CallbackQuery
 
 from database.db import Database
+from keyboards.inline import InlineKeyboards
+
+PAGE_SIZE = 3
 
 def register_history_handlers(dp: Dispatcher):
 
@@ -15,7 +18,7 @@ def register_history_handlers(dp: Dispatcher):
         if not surveys:
             await message.answer(
                 "У вас нет опросов\n"
-                "Введи /history, чтобы1 начать опрос."
+                "Введи /history, чтобы начать опрос."
             )
             return
 
@@ -30,17 +33,58 @@ def register_history_handlers(dp: Dispatcher):
             )
             await message.answer(text)
 
-    @dp.message(Command("stats"))
-    async def cmd_stats(message: Message):
+        total_pages = (len(surveys) + PAGE_SIZE - 1)
 
-        stats = await Database.get_stats()
+        await show_page(message, surveys, page=0, total_pages=total_pages, edit=False)
 
-        if not stats:
-            await message.answer(
-                "Никто не отправлял опросы.\n"
-                "Введи /history, чтобы1 начать опрос."
-            )
+    @dp.message(Command("clear_history"))
+    async def cmd_clear_history(message: Message):
+
+        user_id = message.from_user.id
+        surveys = await Database.get_user_surveys(user_id)
+
+        if not surveys:
+            await message.answer("У тебя нет опросов для удаления")
             return
 
-        user_count, survey_count, survey_age = stats
-        await message.answer(f"Статистика бота: пользователей — {user_count}, опросов — {survey_count}, средний возраст — {survey_age}")
+        await Database.delete_user_surveys(user_id)
+        await message.answer(
+            "Опросы удалены.\n"
+            "Введи /history, чтобы начать опрос."
+        )
+
+    async def show_page(message, surveys, page: int, total_pages: int, edit: bool = False):
+
+        start = page * PAGE_SIZE
+        end = start + PAGE_SIZE
+        page_items = surveys[start:end]
+
+        text = f"Ваша история опросов: {page + 1}/{total_pages}\n\n"
+
+        for i, survey in enumerate(page_items, start=start+1):
+            name, age, city, language, created_at = survey
+            text += (
+                f"{i}. {created_at}\n"
+                f"{name}, {age} лет, {city}\n"
+                f"Любимый язык: {language}\n\n"
+            )
+
+        keyboard = InlineKeyboards.pagination(page, total_pages)
+
+        if edit:
+            try:
+                await message.edit_text(text, reply_markup=keyboard)
+            except Exception:
+                await message.answer(text, reply_markup=keyboard)
+        else:
+            await message.answer(text, reply_markup=keyboard)
+
+    @dp.callback_query(F.data.start.startswith("page_"))
+    async def handle_pagination(callback: CallbackQuery):
+        page = int(callback.data.split("_")[1])
+        user_id = callback.from_user.id
+        surveys = await Database.get_user_surveys(user_id)
+        total_pages = (len(surveys) + PAGE_SIZE - 1)
+
+        await show_page(callback.message, surveys, page, total_pages, edit=True)
+        await callback.answer()

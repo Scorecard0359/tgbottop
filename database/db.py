@@ -54,6 +54,15 @@ class Database:
             await db.commit()
 
     @staticmethod
+    async def delete_user_surveys(user_id: int):
+
+        async with sq.connect(DB_PATH) as db:
+            await db.execute("""
+                DELETE FROM surveys WHERE user_id = ?
+            """, (user_id,))
+            await db.commit()
+
+    @staticmethod
     async def get_user_surveys(user_id: int):
         
         async with sq.connect(DB_PATH) as db:
@@ -108,3 +117,24 @@ class Database:
             survey_age = await survey_age.fetchone()
 
             return user_count[0], survey_count[0], survey_age[0]
+
+    @staticmethod
+    async def count_all_surveys():
+        async with sq.connect(DB_PATH) as db:
+            cursor = await db.execute("SELECT COUNT(*) FROM surveys")
+            result = await cursor.fetchone()
+            return results[0]
+
+    @staticmethod
+    async def count_users():
+        async with sq.connect(DB_PATH) as db:
+            cursor = await db.execute("SELECT COUNT(DISTINCT user_id) FROM surveys")
+            result = await cursor.fetchone()
+            return results[0]
+
+    @staticmethod
+    async def count_surveys_user(user_id: int):
+        async with sq.connect(DB_PATH) as db:
+            cursor = await db.execute("SELECT COUNT(*) FROM surveys WHERE user_id = ?", (user_id,))
+            result = await cursor.fetchone()
+            return results[0]

@@ -10,6 +10,7 @@ from middlewares.logging import LoggingMiddleware
 from middlewares.auth import AdminMiddleware
 from middlewares.logfile import LogFileMiddleware
 from middlewares.counter import UserCounterMiddleware
+from middlewares.error import ErrorMiddleware
 from database.db import Database
 
 class TelegramBot:
@@ -24,16 +25,16 @@ class TelegramBot:
 
         self.dp = Dispatcher()
 
-        # self._setup_middlewares()
+        self._setup_middlewares()
 
         register_all_handlers(self.dp)
 
         logging.info("Бот инициализирован.")
 
     def _setup_middlewares(self):
-        pass
+        self.dp.update.outer_middleware(LoggingMiddleware())
 
-        # self.dp.update.outer_middleware(LoggingMiddleware())
+        self.dp.update.outer_middleware(ErrorMiddleware(7135056293))
 
         # self.dp.update.outer_middleware(LogFileMiddleware())
 

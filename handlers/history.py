@@ -84,7 +84,7 @@ def register_history_handlers(dp: Dispatcher):
         page = int(callback.data.split("_")[1])
         user_id = callback.from_user.id
         surveys = await Database.get_user_surveys(user_id)
-        total_pages = (len(surveys) + PAGE_SIZE - 1)
+        total_pages = (len(surveys) + PAGE_SIZE - 1) // PAGE_SIZE
 
         await show_page(callback.message, surveys, page, total_pages, edit=True)
         await callback.answer()
